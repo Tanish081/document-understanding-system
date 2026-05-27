@@ -26,7 +26,8 @@ COPY . .
 # Ensure upload/output directories exist inside the container.
 RUN mkdir -p uploads outputs
 
-EXPOSE 5000
+EXPOSE 10000
 
 # gunicorn: 2 workers, 120 s timeout (OCR on large PDFs can be slow).
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 app:app
+# Render injects PORT=10000 by default for Docker services.
+CMD gunicorn --bind 0.0.0.0:${PORT:-10000} --workers 2 --timeout 120 app:app
