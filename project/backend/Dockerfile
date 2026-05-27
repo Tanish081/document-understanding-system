@@ -29,4 +29,4 @@ RUN mkdir -p uploads outputs
 EXPOSE 5000
 
 # gunicorn: 2 workers, 120 s timeout (OCR on large PDFs can be slow).
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "app:app"]
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 app:app
