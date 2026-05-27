@@ -1,7 +1,7 @@
 [build]
   base    = "project/frontend"
   command = "npm run build"
-  publish = "project/frontend/dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
