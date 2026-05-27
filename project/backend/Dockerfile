@@ -17,8 +17,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download the spaCy medium model (better NER accuracy than sm).
-RUN python -m spacy download en_core_web_md
+# Download spaCy models — md preferred, sm available as fallback.
+RUN python -m spacy download en_core_web_sm && python -m spacy download en_core_web_md
 
 # Copy application source.
 COPY . .
@@ -28,6 +28,6 @@ RUN mkdir -p uploads outputs
 
 EXPOSE 10000
 
-# gunicorn: 2 workers, 120 s timeout (OCR on large PDFs can be slow).
-# Render injects PORT=10000 by default for Docker services.
-CMD gunicorn --bind 0.0.0.0:${PORT:-10000} --workers 2 --timeout 120 app:app
+# 1 worker + preload: app (including spaCy en_core_web_md ~200 MB) loads once before
+# the worker forks, keeping total RAM inside Render free tier's 512 MB limit.
+CMD gunicorn --bind 0.0.0.0:${PORT:-10000} --workers 1 --timeout 120 --preload app:app
