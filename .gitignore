@@ -1,0 +1,39 @@
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+
+# ── Uploaded / generated files ────────────────────────────────────
+project/backend/uploads/*
+project/backend/outputs/*
+!project/backend/uploads/.gitkeep
+!project/backend/outputs/.gitkeep
+
+# ── Frontend ───────────────────────────────────────────────────────
+project/frontend/node_modules/
+project/frontend/dist/
+project/frontend/.env
+project/frontend/.env.local
+
+# ── Claude / editor internals ─────────────────────────────────────
+.claude/
+
+# ── OS / editor ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ── Secrets ───────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example

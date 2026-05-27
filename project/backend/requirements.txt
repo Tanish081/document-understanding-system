@@ -1,0 +1,9 @@
+flask
+flask-cors
+pymupdf
+pdfplumber
+pytesseract
+Pillow
+opencv-python-headless
+spacy
+gunicorn
