@@ -9,7 +9,7 @@ from routes.upload_routes import upload_bp
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
     app.register_blueprint(upload_bp)
 
     @app.get("/health")

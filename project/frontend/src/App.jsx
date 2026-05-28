@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 import Sidebar from './components/Sidebar';
 import UploadSection from './components/UploadSection';
 import TextViewer from './components/TextViewer';
@@ -58,6 +60,12 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [recentFiles, setRecentFiles] = useState([]);
+
+  // Pre-warm the backend on page load so Render's free-tier service wakes up
+  // before the user tries to upload.
+  useEffect(() => {
+    fetch(`${API_BASE}/health`).catch(() => {});
+  }, []);
 
   const handleResult = (data) => {
     setError(null);

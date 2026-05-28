@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 10_000;
 
 const CLOUD_ICON = (
   <svg width="38" height="38" viewBox="0 0 24 24" fill="none"
@@ -26,30 +28,38 @@ function UploadSection({ onResult, onError }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('Processing…');
 
   const uploadFile = async (file) => {
     if (!file) return;
     setSelectedFile(file);
     setIsUploading(true);
+    setStatusMsg('Processing…');
 
     const formData = new FormData();
     formData.append('file', file);
 
-    try {
-      const res = await fetch(`${API_BASE}/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        onError?.(data.error || 'Upload failed.');
-      } else {
-        onResult?.(data);
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) {
+          onError?.(data.error || 'Upload failed.');
+        } else {
+          onResult?.(data);
+        }
+        setIsUploading(false);
+        return;
+      } catch {
+        if (attempt < MAX_RETRIES - 1) {
+          setStatusMsg(`Server is starting up… retrying in 10 s`);
+          await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+          setStatusMsg('Processing…');
+        } else {
+          onError?.('Server is unavailable. Please wait a moment and try uploading again.');
+          setIsUploading(false);
+        }
       }
-    } catch {
-      onError?.('Could not reach the backend. Make sure Flask is running on port 5000.');
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -76,7 +86,7 @@ function UploadSection({ onResult, onError }) {
 
       {isUploading ? (
         <>
-          <p className="drop-title">Processing…</p>
+          <p className="drop-title">{statusMsg}</p>
           <p className="drop-subtitle">{selectedFile?.name}</p>
         </>
       ) : (
